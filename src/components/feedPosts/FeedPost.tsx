@@ -11,6 +11,7 @@ import Carousel from '../Carousel';
 import {useState} from 'react';
 import {IPost} from '../../types/models';
 import styles from './styles';
+import VideoPlayer from '../VideoPlayer';
 
 interface IFeedPost {
   post: IPost;
@@ -36,16 +37,25 @@ const FeedPost = ({post}: IFeedPost) => {
   let content = null;
   if (post.image) {
     content = (
-      <Image
-        source={{
-          uri: post.image,
-        }}
-        style={styles.image}
-      />
+      <DoublePressable onDoublePress={toggleIsLiked}>
+        <Image
+          source={{
+            uri: post.image,
+          }}
+          style={styles.image}
+        />
+      </DoublePressable>
     );
   } else if (post.images) {
-    content = <Carousel images={post.images} />;
+    content = <Carousel images={post.images} onDoublePress={toggleIsLiked} />;
+  } else if (post.video) {
+    content = (
+      <DoublePressable onDoublePress={toggleIsLiked}>
+        <VideoPlayer uri={post.video} />
+      </DoublePressable>
+    );
   }
+
   return (
     <View style={styles.post}>
       {/* Header */}
@@ -64,7 +74,7 @@ const FeedPost = ({post}: IFeedPost) => {
         />
       </View>
       {/* Content */}
-      <DoublePressable onDoublePress={toggleIsLiked}>{content}</DoublePressable>
+      {content}
       {/* Footer */}
       <View style={styles.footer}>
         <View style={styles.iconContainer}>
