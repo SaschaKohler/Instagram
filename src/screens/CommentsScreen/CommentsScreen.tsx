@@ -8,7 +8,8 @@ const CommentsScreen = () => {
     <View>
       <FlatList
         data={comments}
-        renderItem={({item}) => <Comment comment={item} />}
+        renderItem={({item}) => <Comment comment={item} includeDetails />}
+        style={styles.container}
       />
     </View>
   );
@@ -16,4 +17,8 @@ const CommentsScreen = () => {
 
 export default CommentsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    margin: 10,
+  },
+});

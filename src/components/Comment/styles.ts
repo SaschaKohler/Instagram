@@ -17,9 +17,25 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  middleColumn: {
+    flex: 1,
+  },
   commentText: {
     color: colors.black,
-    flex: 1,
     lineHeight: 18,
+  },
+  footer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  footerText: {
+    flexDirection: 'row',
+    marginRight: 10,
+  },
+  avatar: {
+    width: 40,
+    borderRadius: 25,
+    aspectRatio: 1,
+    marginRight: 5,
   },
 });
