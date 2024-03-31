@@ -20,13 +20,10 @@ const Carousel = ({images, onDoublePress = () => {}}: ICarousel) => {
   const {width} = useWindowDimensions();
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const viewabilityConfig = {
-    waitForInteraction: true,
-    // At least one of the viewAreaCoveragePercentThreshold or itemVisiblePercentThreshold is required.
-    viewAreaCoveragePercentThreshold: 95,
-    itemVisiblePercentThreshold: 75,
-  };
 
+  // const viewabilityConfig: ViewabilityConfig = useRef({
+  //   itemVisiblePercentThreshold: 51,
+  // });
   const onViewableItemsChanged = useRef(
     ({viewableItems}: {viewableItems: Array<ViewToken>}) => {
       if (viewableItems.length > 0) {
@@ -47,6 +44,7 @@ const Carousel = ({images, onDoublePress = () => {}}: ICarousel) => {
         pagingEnabled
         horizontal
         onViewableItemsChanged={onViewableItemsChanged.current} //
+        // viewabilityConfig={viewabilityConfig.current}
       />
       <View
         style={{
