@@ -12,7 +12,7 @@ export interface IPost {
 }
 
 export interface IComment {
-  id: string;
+  id: string | number;
   comment: string;
   user?: IUser | null;
 }

@@ -12,7 +12,9 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  app: {},
+  app: {
+    flex: 1,
+  },
 });
 
 export default App;
