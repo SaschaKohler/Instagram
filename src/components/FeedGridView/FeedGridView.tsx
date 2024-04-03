@@ -17,6 +17,7 @@ const FeedGridView = ({data, ListHeaderComponent}: IFeedGridView) => {
       numColumns={3}
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={ListHeaderComponent}
+      style={{marginHorizontal: -1}}
     />
   );
 };

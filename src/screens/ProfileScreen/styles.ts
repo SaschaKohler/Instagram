@@ -19,7 +19,6 @@ export default StyleSheet.create({
   numberContainer: {
     flexDirection: 'column',
     marginLeft: 10,
-    // justifyContent: 'center',
     alignItems: 'center',
   },
   numberText: {
