@@ -13,6 +13,8 @@ import {IPost} from '../../types/models';
 import styles from './styles';
 import VideoPlayer from '../VideoPlayer';
 
+import {useNavigation} from '@react-navigation/native';
+
 interface IFeedPost {
   post: IPost;
   isVisible: boolean;
@@ -22,7 +24,11 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
   const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
   const [isLiked, setLiked] = useState(false);
   const [isBookmarked, setBookmark] = useState(false);
+  const navigation = useNavigation();
 
+  const navigateToUser = () => {
+    navigation.navigate('UserProfile', {userId: post.user?.id});
+  };
   const toggleIsBookmarked = () => {
     setBookmark(v => !v);
   };
@@ -34,6 +40,7 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
   const toggleDescriptionExpanded = () => {
     setDescriptionExpanded(v => !v);
   };
+
   let content = null;
   if (post.image) {
     content = (
@@ -66,7 +73,9 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
           }}
           style={styles.userAvatar}
         />
-        <Text style={styles.userName}>{post.user.username}</Text>
+        <Text onPress={navigateToUser} style={styles.userName}>
+          {post.user.username}
+        </Text>
         <Entypo
           name="dots-three-horizontal"
           size={16}

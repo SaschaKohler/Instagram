@@ -1,4 +1,4 @@
-import {FlatList, Image} from 'react-native';
+import {FlatList} from 'react-native';
 import {IPost} from '../../types/models';
 import FeedGridItem from './FeedGridItem';
 interface IFeedGridView {
