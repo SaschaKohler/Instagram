@@ -7,13 +7,16 @@ import colors from '../../theme/colors';
 import Comment from '../Comment';
 import DoublePressable from '../DoublePressable';
 import Carousel from '../Carousel';
-
 import {useState} from 'react';
 import {IPost} from '../../types/models';
 import styles from './styles';
 import VideoPlayer from '../VideoPlayer';
 
 import {useNavigation} from '@react-navigation/native';
+import {
+  FeedNavigationProp,
+  CommentsNavigationProp,
+} from '../../navigation/types';
 
 interface IFeedPost {
   post: IPost;
@@ -24,10 +27,14 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
   const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
   const [isLiked, setLiked] = useState(false);
   const [isBookmarked, setBookmark] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<FeedNavigationProp>();
 
   const navigateToUser = () => {
     navigation.navigate('UserProfile', {userId: post.user?.id});
+  };
+
+  const navigateToComments = () => {
+    navigation.navigate('Comments', {postId: post.id});
   };
   const toggleIsBookmarked = () => {
     setBookmark(v => !v);
@@ -133,7 +140,7 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
         </Text>
 
         {/* Comments */}
-        <Text>
+        <Text onPress={navigateToComments}>
           View all <Text>{post.nofComments}</Text> comments
         </Text>
         {post.comments.map(comment => (

@@ -1,11 +1,10 @@
-import {Image, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import ProfileScreen from '../screens/ProfileScreen';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import logo from '../assets/images/logo.png';
 import BottomTabNavigator from './BottomTabNavigator';
+import CommentsScreen from '../screens/CommentsScreen/CommentsScreen';
+import {RootNavigator} from './types';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootNavigator>();
 
 const Navigation = () => {
   return (
@@ -16,11 +15,7 @@ const Navigation = () => {
           component={BottomTabNavigator}
           options={{headerShown: false}}
         />
-        <Stack.Screen
-          name="UserProfile"
-          component={ProfileScreen}
-          options={{title: 'Profile'}}
-        />
+        <Stack.Screen name="Comments" component={CommentsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
