@@ -107,7 +107,6 @@ const PostUploadScreen = () => {
       setIsRecording(false);
     }
   };
-  console.warn(flash);
 
   return (
     <View style={styles.container}>
