@@ -4,8 +4,13 @@ import user from '../../assets/data/user.json';
 import Button from '../../components/Button/Button';
 import {useNavigation} from '@react-navigation/native';
 import {ProfileNavigationProp} from '../../navigation/types';
-
+import {
+  withAuthenticator,
+  useAuthenticator,
+} from '@aws-amplify/ui-react-native';
+const userSelector = context => [context.user];
 const ProfileHeader = () => {
+  const {user, signOut} = useAuthenticator(userSelector);
   const navigation = useNavigation<ProfileNavigationProp>();
   return (
     <View style={styles.root}>
@@ -34,10 +39,7 @@ const ProfileHeader = () => {
           text="Edit Profile"
           onPress={() => navigation.navigate('Edit Profile')}
         />
-        <Button
-          text="Another Button"
-          onPress={() => console.warn('On Another Button')}
-        />
+        <Button text="Sign out" onPress={signOut} />
       </View>
     </View>
   );
