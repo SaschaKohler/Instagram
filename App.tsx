@@ -12,4 +12,4 @@ const App = () => {
   return <Navigation />;
 };
 
-export default withAuthenticator(App);
+export default App;

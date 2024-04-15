@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
 import CommentsScreen from '../screens/CommentsScreen/CommentsScreen';
 import {RootNavigatorParamList} from './types';
+import AuthStackNavigator from './AuthStackNavigator';
 
 const Stack = createNativeStackNavigator<RootNavigatorParamList>();
 const linking: LinkingOptions<RootNavigatorParamList> = {
@@ -27,7 +28,12 @@ const linking: LinkingOptions<RootNavigatorParamList> = {
 const Navigation = () => {
   return (
     <NavigationContainer linking={linking}>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Auth">
+        <Stack.Screen
+          name="Auth"
+          component={AuthStackNavigator}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="Home"
           component={BottomTabNavigator}
