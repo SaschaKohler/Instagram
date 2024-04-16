@@ -5,10 +5,10 @@ import CustomButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/core';
 import {useForm} from 'react-hook-form';
 import {ForgotPasswordNavigationProp} from '../../../types/navigation';
-import {Auth} from 'aws-amplify';
+import {resetPassword, type resetPasswordOutput} from 'aws-amplify/auth';
 
 type ForgotPasswordData = {
-  email: string;
+  username: string;
 };
 
 const ForgotPasswordScreen = () => {
@@ -16,23 +16,40 @@ const ForgotPasswordScreen = () => {
   const navigation = useNavigation<ForgotPasswordNavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  const onSendPressed = async ({email}: ForgotPasswordData) => {
+  const onSendPressed = async ({username}: ForgotPasswordData) => {
     if (loading) {
       return;
     }
     setLoading(true);
 
     try {
-      const response = await Auth.forgotPassword(email);
-      Alert.alert(
-        'Check your email',
-        `The code has been sent to ${response.CodeDeliveryDetails.Destination}`,
-      );
+      const response = await resetPassword({username});
+      handleResetPasswordNextSteps(response);
       navigation.navigate('New password');
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);
     } finally {
       setLoading(false);
+    }
+  };
+  const handleResetPasswordNextSteps = (response: resetPasswordOutput) => {
+    const {nextStep} = response;
+    switch (nextStep.resetPasswordStep) {
+      case 'CONFIRM_RESET_PASSWORD_WITH_CODE':
+        const codeDeliveryDetails = nextStep.codeDeliveryDetails;
+        console.log(codeDeliveryDetails);
+
+        Alert.alert(
+          'Check your email',
+          `The Confirmation code has been sent to ${codeDeliveryDetails.Destination}`,
+        );
+        console.log(
+          `Confirmation code was sent to ${codeDeliveryDetails.deliveryMedium}`,
+        );
+        break;
+      case 'DONE':
+        console.log('Successfully reset password');
+        break;
     }
   };
 
@@ -46,11 +63,11 @@ const ForgotPasswordScreen = () => {
         <Text style={styles.title}>Reset your password</Text>
 
         <FormInput
-          name="email"
+          name="username"
           control={control}
-          placeholder="Email"
+          placeholder="Username"
           rules={{
-            required: 'Email is required',
+            required: 'Username is required',
           }}
         />
 

@@ -6,41 +6,55 @@ import {useNavigation} from '@react-navigation/core';
 import {useForm} from 'react-hook-form';
 import {SignUpNavigationProp} from '../../../types/navigation';
 import colors from '../../../theme/colors';
-import {Auth} from 'aws-amplify';
+import {autoSignIn, signUp} from 'aws-amplify/auth';
 import {useState} from 'react';
 
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-type SignUpData = {
+type SignUpParameters = {
   name: string;
+  username: string;
   email: string;
   password: string;
   passwordRepeat: string;
 };
 
 const SignUpScreen = () => {
-  const {control, handleSubmit, watch} = useForm<SignUpData>();
+  const {control, handleSubmit, watch} = useForm<SignUpParameters>();
   const pwd = watch('password');
   const navigation = useNavigation<SignUpNavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  const onRegisterPressed = async ({name, email, password}: SignUpData) => {
+  const onRegisterPressed = async ({
+    email,
+    name,
+    username,
+    password,
+  }: SignUpParameters) => {
     if (loading) {
       return;
     }
     setLoading(true);
 
     try {
-      await Auth.signUp({
-        username: email,
+      const {isSignUpComplete, userId, nextStep} = await signUp({
+        username,
         password,
-        attributes: {name, email},
+        options: {
+          userAttributes: {
+            email,
+            name,
+          },
+          // optional
+          autoSignIn: true, // or SignInOptions e.g { authFlowType: "USER_SRP_AUTH" }
+        },
       });
 
       navigation.navigate('Confirm email', {email});
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);
+      console.log('Oops', (e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -64,9 +78,25 @@ const SignUpScreen = () => {
         <Text style={styles.title}>Create an account</Text>
 
         <FormInput
+          name="username"
+          control={control}
+          placeholder="User Name"
+          rules={{
+            required: 'Name is required',
+            minLength: {
+              value: 3,
+              message: 'Name should be at least 3 characters long',
+            },
+            maxLength: {
+              value: 24,
+              message: 'Name should be max 24 characters long',
+            },
+          }}
+        />
+        <FormInput
           name="name"
           control={control}
-          placeholder="Full name"
+          placeholder="Full Name"
           rules={{
             required: 'Name is required',
             minLength: {

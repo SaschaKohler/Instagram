@@ -13,34 +13,35 @@ import SocialSignInButtons from '../components/SocialSignInButtons';
 import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
 import {SignInNavigationProp} from '../../../types/navigation';
-import {Auth} from 'aws-amplify';
+import {signIn, type SignInInput} from 'aws-amplify/auth';
 import {useState} from 'react';
 
-type SignInData = {
-  email: string;
-  password: string;
-};
+// type SignInData = {
+//   email: string;
+//   password: string;
+// };
 
 const SignInScreen = () => {
   const {height} = useWindowDimensions();
   const navigation = useNavigation<SignInNavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  const {control, handleSubmit, reset} = useForm<SignInData>();
+  const {control, handleSubmit, reset} = useForm<SignInInput>();
 
-  const onSignInPressed = async ({email, password}: SignInData) => {
+  const onSignInPressed = async ({username, password}: SignInInput) => {
     if (loading) {
       return;
     }
     setLoading(true);
     try {
-      await Auth.signIn(email, password);
-    } catch (e) {
-      if ((e as Error).name === 'UserNotConfirmedException') {
-        navigation.navigate('Confirm email', {email});
+      const {isSignedIn, nextStep} = await signIn({username, password});
+      if (nextStep.signInStep === 'CONFIRM_SIGN_UP') {
+        navigation.navigate('Confirm email', {username});
       } else {
-        Alert.alert('Oopps', (e as Error).message);
+        console.log({isSignedIn});
       }
+    } catch (e) {
+      Alert.alert('Oopps', (e as Error).message);
     } finally {
       setLoading(false);
       reset();
@@ -65,10 +66,10 @@ const SignInScreen = () => {
         />
 
         <FormInput
-          name="email"
-          placeholder="Email"
+          name="username"
+          placeholder="username"
           control={control}
-          rules={{required: 'Email is required'}}
+          rules={{required: 'username is required'}}
         />
 
         <FormInput

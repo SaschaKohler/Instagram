@@ -10,15 +10,19 @@ import {
   ConfirmEmailRouteProp,
 } from '../../../types/navigation';
 import {useRoute} from '@react-navigation/native';
-import {Auth} from 'aws-amplify';
+import {
+  ConfirmSignInInput,
+  confirmSignUp,
+  type ConsfirmSignUpInput,
+} from 'aws-amplify/auth';
 
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-type ConfirmEmailData = {
-  email: string;
-  code: string;
-};
+// type ConfirmEmailData = {
+//   email: string;
+//   code: string;
+// };
 
 const ConfirmEmailScreen = () => {
   const route = useRoute<ConfirmEmailRouteProp>();
@@ -31,14 +35,17 @@ const ConfirmEmailScreen = () => {
 
   const email = watch('email');
 
-  const onConfirmPressed = async ({email, code}: ConfirmEmailData) => {
+  const onConfirmPressed = async ({
+    username,
+    confirmationCode,
+  }: ConfirmSignInInput) => {
     if (loading) {
       return;
     }
     setLoading(true);
 
     try {
-      await Auth.confirmSignUp(email, code);
+      await confirmSignUp({username, confirmationCode});
       navigation.navigate('Sign in');
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);
@@ -66,17 +73,24 @@ const ConfirmEmailScreen = () => {
         <Text style={styles.title}>Confirm your email</Text>
 
         <FormInput
-          name="email"
+          name="username"
           control={control}
-          placeholder="Email"
+          placeholder="Username"
           rules={{
-            required: 'Username is required',
-            pattern: {value: EMAIL_REGEX, message: 'Email is invalid'},
+            required: 'Name is required',
+            minLength: {
+              value: 3,
+              message: 'Name should be at least 3 characters long',
+            },
+            maxLength: {
+              value: 24,
+              message: 'Name should be max 24 characters long',
+            },
           }}
         />
 
         <FormInput
-          name="code"
+          name="confirmationCode"
           control={control}
           placeholder="Enter your confirmation code"
           rules={{

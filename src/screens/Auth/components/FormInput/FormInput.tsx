@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, TextInput, StyleSheet} from 'react-native';
 import {Control, Controller, Path} from 'react-hook-form';
+import colors from '../../../../theme/colors';
 
 interface ICustomInput<ContentType> {
   control: Control<ContentType, object>;
@@ -34,6 +35,7 @@ function CustomInput<ContentType>({
               onChangeText={onChange}
               onBlur={onBlur}
               placeholder={placeholder}
+              placeholderTextColor={colors.grey} // for ios hardware
               style={styles.input}
               secureTextEntry={secureTextEntry}
             />

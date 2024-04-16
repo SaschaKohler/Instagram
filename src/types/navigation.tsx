@@ -121,7 +121,7 @@ export type ProfileNavigationProp = NativeStackNavigationProp<
 export type AuthStackNavigatorParamList = {
   'Sign in': undefined;
   'Sign up': undefined;
-  'Confirm email': {email?: string};
+  'Confirm email': {username?: string};
   'Forgot password': undefined;
   'New password': undefined;
 };

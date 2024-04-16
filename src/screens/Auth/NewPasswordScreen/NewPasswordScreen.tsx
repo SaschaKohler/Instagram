@@ -5,12 +5,15 @@ import CustomButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
 import {NewPasswordNavigationProp} from '../../../types/navigation';
-import {Auth} from 'aws-amplify';
+import {
+  confirmResetPassword,
+  type ConfirmResetPasswordInput,
+} from 'aws-amplify/auth';
 
 type NewPasswordType = {
-  email: string;
-  code: string;
-  password: string;
+  username: string;
+  confirmationCode: string;
+  newPassword: string;
 };
 
 const NewPasswordScreen = () => {
@@ -19,15 +22,19 @@ const NewPasswordScreen = () => {
 
   const navigation = useNavigation<NewPasswordNavigationProp>();
 
-  const onSubmitPressed = async ({email, code, password}: NewPasswordType) => {
+  const onSubmitPressed = async ({
+    username,
+    confirmationCode,
+    newPassword,
+  }: ConfirmResetPasswordInput) => {
     if (loading) {
       return;
     }
     setLoading(true);
 
     try {
-      await Auth.forgotPasswordSubmit(email, code, password);
-      navigation.navigate('Sign in');
+      await confirmResetPassword({username, confirmationCode, newPassword});
+      // navigation.navigate('Sign in');
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);
     } finally {
@@ -45,22 +52,22 @@ const NewPasswordScreen = () => {
         <Text style={styles.title}>Reset your password</Text>
 
         <FormInput
-          placeholder="Email"
-          name="email"
+          placeholder="Username"
+          name="username"
           control={control}
-          rules={{required: 'Email is required'}}
+          rules={{required: 'Username is required'}}
         />
 
         <FormInput
           placeholder="Code"
-          name="code"
+          name="confirmationCode"
           control={control}
           rules={{required: 'Code is required'}}
         />
 
         <FormInput
           placeholder="Enter your new password"
-          name="password"
+          name="newPassword"
           control={control}
           secureTextEntry
           rules={{
