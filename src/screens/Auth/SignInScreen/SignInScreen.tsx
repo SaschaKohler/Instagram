@@ -13,9 +13,10 @@ import SocialSignInButtons from '../components/SocialSignInButtons';
 import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
 import {SignInNavigationProp} from '../../../types/navigation';
-import {signIn, type SignInInput} from 'aws-amplify/auth';
-import {useState} from 'react';
-
+import {getCurrentUser, signIn, type SignInInput} from 'aws-amplify/auth';
+import {useState, useContext} from 'react';
+import {useAuthContext} from '../../../contexts/AuthContext';
+import {Authenticator, useAuthenticator} from '@aws-amplify/ui-react-native';
 // type SignInData = {
 //   email: string;
 //   password: string;
@@ -25,7 +26,7 @@ const SignInScreen = () => {
   const {height} = useWindowDimensions();
   const navigation = useNavigation<SignInNavigationProp>();
   const [loading, setLoading] = useState(false);
-
+  const {setUser} = useAuthContext();
   const {control, handleSubmit, reset} = useForm<SignInInput>();
 
   const onSignInPressed = async ({username, password}: SignInInput) => {
@@ -35,10 +36,19 @@ const SignInScreen = () => {
     setLoading(true);
     try {
       const {isSignedIn, nextStep} = await signIn({username, password});
-      if (nextStep.signInStep === 'CONFIRM_SIGN_UP') {
-        navigation.navigate('Confirm email', {username});
-      } else {
-        console.log({isSignedIn});
+
+      switch (nextStep.signInStep) {
+        case 'CONFIRM_SIGN_UP':
+          navigation.navigate('Confirm email', {username});
+          break;
+        case 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED':
+          navigation.navigate('Forgot password', {username});
+          break;
+        case 'DONE':
+          const user = await getCurrentUser();
+          console.log('SignIn.tsx: ', user);
+          setUser(user);
+          break;
       }
     } catch (e) {
       Alert.alert('Oopps', (e as Error).message);

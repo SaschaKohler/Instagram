@@ -7,10 +7,10 @@ import {ProfileNavigationProp} from '../../navigation/types';
 import {
   withAuthenticator,
   useAuthenticator,
+  Authenticator,
 } from '@aws-amplify/ui-react-native';
-const userSelector = context => [context.user];
 const ProfileHeader = () => {
-  const {user, signOut} = useAuthenticator(userSelector);
+  const {signOut} = useAuthenticator();
   const navigation = useNavigation<ProfileNavigationProp>();
   return (
     <View style={styles.root}>

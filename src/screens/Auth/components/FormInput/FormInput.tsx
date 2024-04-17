@@ -36,6 +36,8 @@ function CustomInput<ContentType>({
               onBlur={onBlur}
               placeholder={placeholder}
               placeholderTextColor={colors.grey} // for ios hardware
+              autoCapitalize="none"
+              autoCorrect={false}
               style={styles.input}
               secureTextEntry={secureTextEntry}
             />

@@ -37,11 +37,10 @@ const ForgotPasswordScreen = () => {
     switch (nextStep.resetPasswordStep) {
       case 'CONFIRM_RESET_PASSWORD_WITH_CODE':
         const codeDeliveryDetails = nextStep.codeDeliveryDetails;
-        console.log(codeDeliveryDetails);
 
         Alert.alert(
           'Check your email',
-          `The Confirmation code has been sent to ${codeDeliveryDetails.Destination}`,
+          `The Confirmation code has been sent to ${codeDeliveryDetails.destination}`,
         );
         console.log(
           `Confirmation code was sent to ${codeDeliveryDetails.deliveryMedium}`,
