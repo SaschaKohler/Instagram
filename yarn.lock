@@ -119,6 +119,11 @@
     buffer "^6.0.3"
     react-native-url-polyfill "^2.0.0"
 
+"@aws-amplify/rtn-web-browser@^1.0.28":
+  version "1.0.28"
+  resolved "https://registry.npmjs.org/@aws-amplify/rtn-web-browser/-/rtn-web-browser-1.0.28.tgz"
+  integrity sha512-AD0RgXtyA4bJxXBrLdQ6AzJv2udDJMxhMMwk4qU8M1ceeGk1SmvO99fX6Z1X0z5m8MScHPlKZ2Mc1IkUX2uYig==
+
 "@aws-amplify/storage@6.0.27":
   version "6.0.27"
   resolved "https://registry.npmjs.org/@aws-amplify/storage/-/storage-6.0.27.tgz"

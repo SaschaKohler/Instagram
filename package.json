@@ -1,5 +1,5 @@
 {
-  "name": "Instagram",
+  "name": "skit-mobile",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@aws-amplify/react-native": "^1.0.28",
+    "@aws-amplify/rtn-web-browser": "^1.0.28",
     "@aws-amplify/ui-react-native": "^2.1.5",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/netinfo": "^11.3.1",

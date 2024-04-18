@@ -13,16 +13,17 @@ import {useRoute} from '@react-navigation/native';
 import {
   ConfirmSignInInput,
   confirmSignUp,
-  type ConsfirmSignUpInput,
+  resendSignUpCode,
+  type ConfirmSignUpInput,
 } from 'aws-amplify/auth';
 
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-// type ConfirmEmailData = {
-//   email: string;
-//   code: string;
-// };
+type ConfirmEmailData = {
+  username: string;
+  confirmationCode: string;
+};
 
 const ConfirmEmailScreen = () => {
   const route = useRoute<ConfirmEmailRouteProp>();
@@ -33,12 +34,12 @@ const ConfirmEmailScreen = () => {
 
   const navigation = useNavigation<ConfirmEmailNavigationProp>();
 
-  const email = watch('email');
+  const username = watch('username');
 
   const onConfirmPressed = async ({
     username,
     confirmationCode,
-  }: ConfirmSignInInput) => {
+  }: ConfirmEmailData) => {
     if (loading) {
       return;
     }
@@ -46,6 +47,10 @@ const ConfirmEmailScreen = () => {
 
     try {
       await confirmSignUp({username, confirmationCode});
+      Alert.alert(
+        'Signup confirmed',
+        'Please login with your username/password',
+      );
       navigation.navigate('Sign in');
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);
@@ -60,7 +65,7 @@ const ConfirmEmailScreen = () => {
 
   const onResendPress = async () => {
     try {
-      await Auth.resendSignUp(email);
+      await resendSignUpCode({username});
       Alert.alert('Check your email', 'The code has been sent');
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);
