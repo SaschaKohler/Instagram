@@ -43,7 +43,7 @@ const SignUpScreen = () => {
         password,
         options: {
           userAttributes: {
-            email,
+            email: username,
             name,
           },
           // optional
@@ -51,7 +51,7 @@ const SignUpScreen = () => {
         },
       });
 
-      navigation.navigate('Confirm email', {email});
+      navigation.navigate('Confirm email', {username});
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);
       console.log('Oops', (e as Error).message);
@@ -80,17 +80,10 @@ const SignUpScreen = () => {
         <FormInput
           name="username"
           control={control}
-          placeholder="User Name"
+          placeholder="Email"
           rules={{
-            required: 'Name is required',
-            minLength: {
-              value: 3,
-              message: 'Name should be at least 3 characters long',
-            },
-            maxLength: {
-              value: 24,
-              message: 'Name should be max 24 characters long',
-            },
+            required: 'Username must be a valid Email',
+            pattern: {value: EMAIL_REGEX, message: 'Email is invalid'},
           }}
         />
         <FormInput
@@ -110,15 +103,15 @@ const SignUpScreen = () => {
           }}
         />
 
-        <FormInput
-          name="email"
-          control={control}
-          placeholder="Email"
-          rules={{
-            required: 'Email is required',
-            pattern: {value: EMAIL_REGEX, message: 'Email is invalid'},
-          }}
-        />
+        {/* <FormInput */}
+        {/*   name="email" */}
+        {/*   control={control} */}
+        {/*   placeholder="Email" */}
+        {/*   rules={{ */}
+        {/*     required: 'Email is required', */}
+        {/*     pattern: {value: EMAIL_REGEX, message: 'Email is invalid'}, */}
+        {/*   }} */}
+        {/* /> */}
         <FormInput
           name="password"
           control={control}

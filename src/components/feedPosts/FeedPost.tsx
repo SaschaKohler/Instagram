@@ -17,9 +17,11 @@ import {
   FeedNavigationProp,
   CommentsNavigationProp,
 } from '../../navigation/types';
+import {Post} from '../../API';
+import {DEFAULT_USER_IMAGE} from '../../config';
 
 interface IFeedPost {
-  post: IPost;
+  post: Post;
   isVisible: boolean;
 }
 
@@ -30,7 +32,9 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
   const navigation = useNavigation<FeedNavigationProp>();
 
   const navigateToUser = () => {
-    navigation.navigate('UserProfile', {userId: post.user?.id});
+    if (post.User) {
+      navigation.navigate('UserProfile', {userId: post.User?.id});
+    }
   };
 
   const navigateToComments = () => {
@@ -76,12 +80,12 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
       <View style={styles.header}>
         <Image
           source={{
-            uri: post.user.image,
+            uri: post.User?.image || DEFAULT_USER_IMAGE,
           }}
           style={styles.userAvatar}
         />
         <Text onPress={navigateToUser} style={styles.userName}>
-          {post.user.username}
+          {post.User?.username}
         </Text>
         <Entypo
           name="dots-three-horizontal"
@@ -126,13 +130,13 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
 
         {/* Likes */}
         <Text style={styles.text}>
-          Liked by <Text style={styles.bold}>{post.user.username}</Text> and{' '}
+          Liked by <Text style={styles.bold}>{post.User?.username}</Text> and{' '}
           <Text style={styles.bold}>{post.nofLikes} others</Text>
         </Text>
 
         {/* Post description */}
         <Text style={styles.text} numberOfLines={isDescriptionExpanded ? 0 : 2}>
-          <Text style={styles.bold}>{post.user.username}</Text>
+          <Text style={styles.bold}>{post.User?.username}</Text>
           {post.description}
         </Text>
         <Text onPress={toggleDescriptionExpanded}>
@@ -143,9 +147,9 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
         <Text onPress={navigateToComments}>
           View all <Text>{post.nofComments}</Text> comments
         </Text>
-        {post.comments.map(comment => (
-          <Comment key={comment.id} comment={comment} />
-        ))}
+        {(post.Comments?.items || []).map(
+          comment => comment && <Comment key={comment?.id} comment={comment} />,
+        )}
 
         {/* Popsted date */}
         <Text>{post.createdAt}</Text>

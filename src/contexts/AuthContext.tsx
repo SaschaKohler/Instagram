@@ -43,7 +43,7 @@ const AuthContextProvider = ({children}: {children: ReactNode}) => {
   }, []);
 
   useEffect(() => {
-    const hubListenerSignedOut = Hub.listen('auth', data => {
+    Hub.listen('auth', data => {
       console.log(data);
       const {event} = data.payload;
       if (event === 'signedOut') setUser(null);

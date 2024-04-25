@@ -36,7 +36,7 @@ const SignInScreen = () => {
 
       switch (nextStep.signInStep) {
         case 'CONFIRM_SIGN_UP':
-          navigation.navigate('Confirm email', {username});
+          navigation.navigate('Confirm signup', {username});
           break;
         case 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED':
           navigation.navigate('Forgot password', {username});

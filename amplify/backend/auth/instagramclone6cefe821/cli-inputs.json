@@ -1,10 +1,10 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "testAuthIdentityPool",
+    "identityPoolName": "instagramclone6cefe821_identitypool_6cefe821",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "instag782cfc02",
-    "userPoolName": "InstagramClone",
+    "resourceNameTruncated": "instag6cefe821",
+    "userPoolName": "instagramclone6cefe821_userpool_6cefe821",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -14,13 +14,11 @@
     ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
-    "emailVerificationSubject": "Verification code: {####}",
-    "emailVerificationMessage": "Verification code: {####}",
+    "emailVerificationSubject": "Your verification code",
+    "emailVerificationMessage": "Your verification code is {####}",
     "defaultPasswordPolicy": false,
     "passwordPolicyMinLength": 8,
-    "passwordPolicyCharacters": [
-      "Requires Lowercase"
-    ],
+    "passwordPolicyCharacters": [],
     "requiredAttributes": [
       "email",
       "name"
@@ -28,20 +26,28 @@
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
-    "userpoolClientWriteAttributes": [],
-    "userpoolClientReadAttributes": [],
-    "userpoolClientLambdaRole": "Instag782cfc02_userpoolclient_lambda_role",
+    "userpoolClientWriteAttributes": [
+      "email"
+    ],
+    "userpoolClientReadAttributes": [
+      "email"
+    ],
+    "userpoolClientLambdaRole": "instag6cefe821_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "782cfc02",
-    "resourceName": "InstagramClone",
+    "sharedId": "6cefe821",
+    "resourceName": "instagramclone6cefe821",
     "authSelections": "identityPoolAndUserPool",
-    "serviceName": "Cognito",
     "useDefault": "manual",
-    "userPoolGroups": false,
+    "usernameAttributes": [
+      "email"
+    ],
+    "triggers": {
+      "PostConfirmation": [
+        "custom"
+      ]
+    },
     "userPoolGroupList": [],
-    "adminQueries": false,
-    "thirdPartyAuth": false,
-    "authProviders": [],
+    "serviceName": "Cognito",
     "usernameCaseSensitive": false,
     "useEnabledMfas": true,
     "authRoleArn": {
@@ -57,14 +63,33 @@
       ]
     },
     "breakCircularDependency": true,
-    "dependsOn": [],
+    "dependsOn": [
+      {
+        "category": "function",
+        "resourceName": "instagramclone6cefe821PostConfirmation",
+        "triggerProvider": "Cognito",
+        "attributes": [
+          "Arn",
+          "Name"
+        ]
+      }
+    ],
+    "thirdPartyAuth": false,
+    "userPoolGroups": false,
+    "adminQueries": false,
     "hostedUI": true,
-    "hostedUIDomainName": "mfkhke5khx8i",
+    "hostedUIDomainName": "instagramclonea9b26f16-a9b26f16",
     "authProvidersUserPool": [
       "Facebook",
       "Google"
     ],
     "hostedUIProviderMeta": "[{\"ProviderName\":\"Facebook\",\"authorize_scopes\":\"email,public_profile\",\"AttributeMapping\":{\"email\":\"email\",\"name\":\"name\",\"username\":\"id\"}},{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid email profile\",\"AttributeMapping\":{\"email\":\"email\",\"name\":\"name\",\"username\":\"sub\"}}]",
+    "authProviders": [],
+    "parentStack": {
+      "Ref": "AWS::StackId"
+    },
+    "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PostConfirmation\",\n    \"lambdaFunctionName\": \"instagramclone6cefe821PostConfirmation\"\n  }\n]",
+    "permissions": [],
     "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"skitphotos://\"],\"LogoutURLs\":[\"skitphotos://\"]}"
   }
 }

@@ -1,0 +1,24 @@
+{
+  "trigger": true,
+  "modules": [
+    "custom"
+  ],
+  "parentResource": "InstagramClone",
+  "functionName": "InstagramClonePostConfirmation",
+  "resourceName": "InstagramClonePostConfirmation",
+  "parentStack": "auth",
+  "triggerEnvs": "[]",
+  "triggerDir": "/snapshot/amplify-cli/build/node_modules/@aws-amplify/amplify-category-auth/provider-utils/awscloudformation/triggers/PostConfirmation",
+  "triggerTemplate": "PostConfirmation.json.ejs",
+  "triggerEventPath": "PostConfirmation.event.json",
+  "roleName": "InstagramClonePostConfirmation",
+  "skipEdit": true,
+  "permissions": {
+    "api": {
+      "InstagramClone": [
+        "Query",
+        "Mutation"
+      ]
+    }
+  }
+}
