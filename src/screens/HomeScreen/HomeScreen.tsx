@@ -1,66 +1,24 @@
-import {View, FlatList, ViewToken, ViewabilityConfig} from 'react-native';
+import {
+  Text,
+  FlatList,
+  ViewToken,
+  ViewabilityConfig,
+  ActivityIndicator,
+  View,
+} from 'react-native';
 import FeedPost from '../../components/feedPosts/';
-// import posts from '../../assets/data/posts.json';
-import {useState, useRef, useEffect} from 'react';
-import {generateClient} from 'aws-amplify/api';
-// import {listPosts, listUsers} from '../../graphql/queries';
+import {useState, useRef} from 'react';
+import {listPosts} from './queries';
+import {useQuery} from '@apollo/client';
+import {ListPostsQuery, ListPostsQueryVariables} from '../../API';
+import ApiErrorMessage from '../../components/ApiErrorMessage/ApiErrorMessage';
 
-const client = generateClient();
-
-export const listPosts = /* GraphQL */ `
-  query ListPosts(
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listPosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        description
-        image
-        images
-        video
-        nofLikes
-        nofComments
-        userID
-        createdAt
-        updatedAt
-        __typename
-        User {
-          id
-          name
-          username
-          image
-        }
-        Comments {
-          items {
-            id
-            comment
-            User {
-              id
-              username
-            }
-          }
-        }
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
 const HomeScreen = () => {
   const [activePostId, setActivePostId] = useState<string | null>(null);
-  const [posts, setPosts] = useState();
-
-  const fetchPosts = async () => {
-    const response = await client.graphql({query: listPosts});
-    console.log(response.data.listPosts.items);
-    setPosts(response.data.listPosts.items);
-  };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  const {data, loading, error} = useQuery<
+    ListPostsQuery,
+    ListPostsQueryVariables
+  >(listPosts);
 
   const viewabilityConfig: ViewabilityConfig = useRef({
     itemVisiblePercentThreshold: 51,
@@ -75,17 +33,30 @@ const HomeScreen = () => {
     },
   );
 
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+  if (error) {
+    return (
+      <ApiErrorMessage title="Some error occured!" message={error.message} />
+    );
+  }
+
+  const posts = data?.listPosts?.items || {};
+
   return (
-    <FlatList
-      data={posts}
-      renderItem={({item}) => (
-        <FeedPost post={item} isVisible={activePostId === item.id} />
-      )}
-      showsVerticalScrollIndicator={false}
-      onViewableItemsChanged={onViewableItemsChanged.current}
-      viewabilityConfig={viewabilityConfig.current}
-    />
+    <View>
+      <FlatList
+        data={posts}
+        renderItem={({item}) =>
+          item && <FeedPost post={item} isVisible={activePostId === item.id} />
+        }
+        showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged.current}
+        viewabilityConfig={viewabilityConfig.current}
+      />
+    </View>
   );
 };
-
+//
 export default HomeScreen;

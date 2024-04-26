@@ -42,4 +42,6 @@ type User @model @auth(rules: [{allow: public}]) {
   Likes: [Like] @hasMany(indexName: "byUser", fields: ["id"])
   nofFollowers: Int!
   nofFollowings: Int
+  nofPosts: Int
 }
+ 

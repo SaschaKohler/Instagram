@@ -4,10 +4,17 @@ import colors from '../../theme/colors';
 interface IButton {
   text?: string;
   onPress?: () => void;
+  inline?: boolean;
 }
-const Button = ({text = 'Button', onPress = () => {}}: IButton) => {
+const Button = ({
+  text = 'Button',
+  onPress = () => {},
+  inline = false,
+}: IButton) => {
   return (
-    <Pressable onPress={onPress} style={styles.container}>
+    <Pressable
+      onPress={onPress}
+      style={[styles.container, inline ? {flex: 1} : {}]}>
       <Text style={styles.text}>{text}</Text>
     </Pressable>
   );
@@ -15,7 +22,6 @@ const Button = ({text = 'Button', onPress = () => {}}: IButton) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
     padding: 5,
     borderWidth: 1,

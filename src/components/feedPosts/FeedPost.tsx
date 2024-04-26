@@ -8,7 +8,6 @@ import Comment from '../Comment';
 import DoublePressable from '../DoublePressable';
 import Carousel from '../Carousel';
 import {useState} from 'react';
-import {IPost} from '../../types/models';
 import styles from './styles';
 import VideoPlayer from '../VideoPlayer';
 

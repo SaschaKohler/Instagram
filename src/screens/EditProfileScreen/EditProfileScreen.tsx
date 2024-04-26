@@ -1,17 +1,36 @@
-import {StyleSheet, Text, View, Image, TextInput} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
 import {Asset, launchImageLibrary} from 'react-native-image-picker';
-import user from '../../assets/data/user.json';
+// import user from '../../assets/data/user.json';
 import colors from '../../theme/colors';
 import fonts from '../../theme/fonts';
-import {Control, Controller, useForm} from 'react-hook-form';
-import {IUser} from '../../types/models';
-import {useState} from 'react';
+import {Control, Controller, set, useForm} from 'react-hook-form';
+import {useEffect, useState} from 'react';
+import {
+  GetUserQuery,
+  GetUserQueryVariables,
+  UpdateUserMutation,
+  UpdateUserMutationVariables,
+  User,
+} from '../../API';
+import {useMutation, useQuery} from '@apollo/client';
+import {getUser, updateUser} from './queries';
+import {useAuthContext} from '../../contexts/AuthContext';
+import ApiErrorMessage from '../../components/ApiErrorMessage';
+import Navigation from '../../navigation';
+import {useNavigation} from '@react-navigation/native';
 
 const URL_REGEX =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/i;
 
 type IEditableUserField = 'name' | 'username' | 'website' | 'bio';
-type IEditableUser = Pick<IUser, IEditableUserField>;
+type IEditableUser = Pick<User, IEditableUserField>;
 
 interface ICustomInput {
   control: Control<IEditableUser, object>;
@@ -61,21 +80,49 @@ const CustomInput = ({
 
 const EditProfileScreen = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<null | Asset>(null);
-  const {
-    control,
-    handleSubmit,
-    formState: {errors},
-  } = useForm<IEditableUser>({
-    defaultValues: {
-      name: user.name,
-      username: user.username,
-      website: user.website,
-      bio: user.bio,
-    },
-  });
+  const {control, handleSubmit, setValue} = useForm<IEditableUser>();
+  const navigation = useNavigation();
+  const currentUser = useAuthContext();
+  const userId = currentUser.user?.userId;
 
-  const onSubmit = (data: IEditableUser) => {
-    console.warn('onSubmit', data);
+  const {data, loading, error, refetch} = useQuery<
+    GetUserQuery,
+    GetUserQueryVariables
+  >(getUser, {variables: {id: userId}});
+
+  const user = data?.getUser;
+
+  const [
+    doUpdateUser,
+    {data: updateData, loading: updateLoading, error: updateError},
+  ] = useMutation<UpdateUserMutation, UpdateUserMutationVariables>(updateUser);
+
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+  if (error || updateError) {
+    return (
+      <ApiErrorMessage
+        title="Error fetching/updating the user"
+        message={error?.message || updateError?.message}
+        onRetry={() => refetch()}
+      />
+    );
+  }
+  useEffect(() => {
+    if (user) {
+      setValue('name', user.name);
+      setValue('username', user.username);
+      setValue('website', user.website);
+      setValue('bio', user.bio);
+    }
+  }, [user, setValue]);
+
+  const onSubmit = async (formData: IEditableUser) => {
+    await doUpdateUser({
+      variables: {input: {id: user?.id, image: selectedPhoto, ...formData}},
+    });
+    navigation.goBack();
   };
 
   const onChangePhoto = () => {
@@ -100,14 +147,34 @@ const EditProfileScreen = () => {
       <CustomInput
         name="name"
         control={control}
-        rules={{required: 'Name is required'}}
         label="Name"
+        rules={{
+          required: 'Name is required',
+          maxLength: {
+            value: 35,
+            message: 'max 35 chars',
+          },
+          minLength: {
+            value: 3,
+            message: 'min 3 chars',
+          },
+        }}
       />
       <CustomInput
         name="username"
         control={control}
-        rules={{required: 'Username is required'}}
         label="Username"
+        rules={{
+          required: 'Username is required',
+          maxLength: {
+            value: 35,
+            message: 'max 35 chars',
+          },
+          minLength: {
+            value: 3,
+            message: 'min 3 chars',
+          },
+        }}
       />
       <CustomInput
         name="website"
@@ -131,7 +198,7 @@ const EditProfileScreen = () => {
         multiline
       />
       <Text onPress={handleSubmit(onSubmit)} style={styles.textButton}>
-        Submit
+        {updateLoading ? 'Submitting ...' : 'Submit'}
       </Text>
     </View>
   );

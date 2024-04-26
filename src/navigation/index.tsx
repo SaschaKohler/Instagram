@@ -37,7 +37,6 @@ const Navigation = () => {
       </View>
     );
   }
-  console.log('Navigation.tsx: ', user);
 
   return (
     <NavigationContainer linking={linking}>

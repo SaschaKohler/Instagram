@@ -6,7 +6,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import Logo from '../../../assets/images/logo.png';
+import Logo from '../../../assets/images/skIT.png';
 import FormInput from '../components/FormInput';
 import CustomButton from '../components/CustomButton';
 import SocialSignInButtons from '../components/SocialSignInButtons';

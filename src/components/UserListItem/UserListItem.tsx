@@ -1,11 +1,11 @@
 import {View, Text, Image, StyleSheet, Pressable} from 'react-native';
-import {IUser} from '../../types/models';
 import fonts from '../../theme/fonts';
 import colors from '../../theme/colors';
 import {useNavigation} from '@react-navigation/native';
+import {User} from '../../API';
 
 interface IUserListItem {
-  user: IUser;
+  user: User;
 }
 
 const UserListItem = ({user}: IUserListItem) => {

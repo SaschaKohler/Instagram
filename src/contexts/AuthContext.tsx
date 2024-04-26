@@ -1,14 +1,6 @@
-import {AuthUser, GetCurrentUserOutput, getCurrentUser} from 'aws-amplify/auth';
+import {getCurrentUser} from 'aws-amplify/auth';
 import {Hub} from 'aws-amplify/utils';
-import {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import {ReactNode, createContext, useContext, useEffect, useState} from 'react';
 
 type CurrentUser = {
   username: string;

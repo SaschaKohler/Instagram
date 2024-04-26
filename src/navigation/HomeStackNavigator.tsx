@@ -1,7 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import logo from '../assets/images/logo.png';
+import logo from '../assets/images/skIT.png';
 import {Image} from 'react-native';
 import {HomeStackNavigatorParamList} from './types';
 

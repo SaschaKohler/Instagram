@@ -1,7 +1,6 @@
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import styles from './styles';
 import colors from '../../theme/colors';
-import {IComment} from '../../types/models';
 import {View, Image, Text, Pressable} from 'react-native';
 import {useState} from 'react';
 import {Comment as CommentType} from '../../API';
