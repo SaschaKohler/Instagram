@@ -15,10 +15,6 @@ import {useForm} from 'react-hook-form';
 import {SignInNavigationProp} from '../../../types/navigation';
 import {signIn, type SignInInput} from 'aws-amplify/auth';
 import {useState} from 'react';
-// type SignInData = {
-//   email: string;
-//   password: string;
-// };
 
 const SignInScreen = () => {
   const {height} = useWindowDimensions();

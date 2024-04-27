@@ -1,5 +1,4 @@
-import {View, Text, FlatList, ActivityIndicator} from 'react-native';
-import users from '../../assets/data/users.json';
+import {FlatList, ActivityIndicator} from 'react-native';
 import UserListItem from '../../components/UserListItem';
 import {listUsers} from './queries';
 import {useQuery} from '@apollo/client';
