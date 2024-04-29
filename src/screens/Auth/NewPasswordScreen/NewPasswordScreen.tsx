@@ -34,7 +34,10 @@ const NewPasswordScreen = () => {
 
     try {
       await confirmResetPassword({username, confirmationCode, newPassword});
-      Alert.alert('password reset successful.Please login with new password');
+      Alert.alert(
+        'password reset successful',
+        'Please login with new password',
+      );
       navigation.navigate('Sign in');
     } catch (e) {
       Alert.alert('Oops', (e as Error).message);

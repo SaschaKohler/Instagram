@@ -5,6 +5,7 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {Asset, launchImageLibrary} from 'react-native-image-picker';
 // import user from '../../assets/data/user.json';
@@ -13,6 +14,8 @@ import fonts from '../../theme/fonts';
 import {Control, Controller, set, useForm} from 'react-hook-form';
 import {useEffect, useState} from 'react';
 import {
+  DeleteUserMutation,
+  DeleteUserMutationVariables,
   GetUserQuery,
   GetUserQueryVariables,
   UpdateUserMutation,
@@ -25,6 +28,9 @@ import {useAuthContext} from '../../contexts/AuthContext';
 import ApiErrorMessage from '../../components/ApiErrorMessage';
 import Navigation from '../../navigation';
 import {useNavigation} from '@react-navigation/native';
+import {deleteUser} from './queries';
+import {deleteUser as authDeleteUser} from 'aws-amplify/auth';
+import {useAuthenticator} from '@aws-amplify/ui-react-native';
 
 const URL_REGEX =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/i;
@@ -82,45 +88,85 @@ const EditProfileScreen = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<null | Asset>(null);
   const {control, handleSubmit, setValue} = useForm<IEditableUser>();
   const navigation = useNavigation();
-  const currentUser = useAuthContext();
-  const userId = currentUser.user?.userId;
+  const {signOut} = useAuthenticator();
+  const {user} = useAuthContext();
+  // const userId = currentUser.user?.userId;
+
+  console.log('EditProfileScreen: user: ', user);
 
   const {data, loading, error, refetch} = useQuery<
     GetUserQuery,
     GetUserQueryVariables
-  >(getUser, {variables: {id: userId}});
+  >(getUser, {variables: {id: user.userId}});
+  const authUser = data?.getUser;
 
-  const user = data?.getUser;
+  useEffect(() => {
+    if (authUser) {
+      setValue('name', authUser.name);
+      setValue('username', authUser.username);
+      setValue('website', authUser.website);
+      setValue('bio', authUser.bio);
+    }
+  }, [authUser, setValue]);
 
   const [
     doUpdateUser,
     {data: updateData, loading: updateLoading, error: updateError},
   ] = useMutation<UpdateUserMutation, UpdateUserMutationVariables>(updateUser);
 
+  const [
+    doDelete,
+    {data: deleteData, loading: deleteLoading, error: deleteError},
+  ] = useMutation<DeleteUserMutation, DeleteUserMutationVariables>(deleteUser);
+
   if (loading) {
     return <ActivityIndicator />;
   }
-  if (error || updateError) {
+  if (error || deleteError || updateError) {
     return (
       <ApiErrorMessage
-        title="Error fetching/updating the user"
-        message={error?.message || updateError?.message}
+        title="Error fetching/updating/deleting the user"
+        message={error?.message || deleteError?.message || updateError?.message}
         onRetry={() => refetch()}
       />
     );
   }
-  useEffect(() => {
-    if (user) {
-      setValue('name', user.name);
-      setValue('username', user.username);
-      setValue('website', user.website);
-      setValue('bio', user.bio);
+
+  const confirmDelete = () => {
+    Alert.alert('Are you sure?', 'Deleting youre UserProfile is permanent!', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Yes, delete',
+        style: 'destructive',
+        onPress: startDeleting,
+      },
+    ]);
+  };
+  const handleDeleteUser = async () => {
+    try {
+      await authDeleteUser();
+    } catch (error) {
+      console.log(error);
     }
-  }, [user, setValue]);
+  };
+
+  const startDeleting = async () => {
+    if (!authUser) {
+      return;
+    }
+    // await doDelete({variables: {input: {id: authUser?.id}}});
+
+    handleDeleteUser();
+    // signOut();
+    // await authDeleteUser();
+  };
 
   const onSubmit = async (formData: IEditableUser) => {
     await doUpdateUser({
-      variables: {input: {id: user?.id, image: selectedPhoto, ...formData}},
+      variables: {input: {id: authUser?.id, ...formData}},
     });
     navigation.goBack();
   };
@@ -200,6 +246,9 @@ const EditProfileScreen = () => {
       <Text onPress={handleSubmit(onSubmit)} style={styles.textButton}>
         {updateLoading ? 'Submitting ...' : 'Submit'}
       </Text>
+      <Text onPress={confirmDelete} style={styles.textButtonDanger}>
+        {deleteLoading ? 'Deleting ...' : 'DELETE USER'}
+      </Text>
     </View>
   );
 };
@@ -217,6 +266,11 @@ const styles = StyleSheet.create({
   textButton: {
     margin: 10,
     color: colors.primary,
+    fontWeight: fonts.weight.semi,
+  },
+  textButtonDanger: {
+    margin: 10,
+    color: colors.error,
     fontWeight: fonts.weight.semi,
   },
   inputContainer: {

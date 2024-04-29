@@ -38,3 +38,16 @@ export const updateUser = gql`
     }
   }
 `;
+export const deleteUser = gql`
+  mutation DeleteUser(
+    $input: DeleteUserInput!
+    $condition: ModelUserConditionInput
+  ) {
+    deleteUser(input: $input, condition: $condition) {
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
