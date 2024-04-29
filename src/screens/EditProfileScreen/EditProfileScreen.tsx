@@ -88,8 +88,8 @@ const EditProfileScreen = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<null | Asset>(null);
   const {control, handleSubmit, setValue} = useForm<IEditableUser>();
   const navigation = useNavigation();
-  const {signOut} = useAuthenticator();
-  const {user} = useAuthContext();
+  const {user, signOut, route} = useAuthenticator();
+  // const {user} = useAuthContext();
   // const userId = currentUser.user?.userId;
 
   console.log('EditProfileScreen: user: ', user);
@@ -98,7 +98,9 @@ const EditProfileScreen = () => {
     GetUserQuery,
     GetUserQueryVariables
   >(getUser, {variables: {id: user.userId}});
+
   const authUser = data?.getUser;
+  console.log(user.signInDetails);
 
   useEffect(() => {
     if (authUser) {
@@ -157,11 +159,9 @@ const EditProfileScreen = () => {
     if (!authUser) {
       return;
     }
-    // await doDelete({variables: {input: {id: authUser?.id}}});
+    await doDelete({variables: {input: {id: authUser?.id}}});
 
     handleDeleteUser();
-    // signOut();
-    // await authDeleteUser();
   };
 
   const onSubmit = async (formData: IEditableUser) => {
@@ -184,7 +184,7 @@ const EditProfileScreen = () => {
   return (
     <View style={styles.page}>
       <Image
-        source={{uri: selectedPhoto?.uri || user.image}}
+        source={{uri: selectedPhoto?.uri || authUser?.image}}
         style={styles.avatar}
       />
       <Text onPress={onChangePhoto} style={styles.textButton}>
@@ -226,7 +226,7 @@ const EditProfileScreen = () => {
         name="website"
         control={control}
         rules={{
-          required: 'Website is required',
+          required: true,
           pattern: {value: URL_REGEX, message: 'Invalid url'},
         }}
         label="Website"
