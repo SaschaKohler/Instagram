@@ -763,3 +763,52 @@ export const listUsers = /* GraphQL */ `query ListUsers(
   }
 }
 ` as GeneratedQuery<APITypes.ListUsersQueryVariables, APITypes.ListUsersQuery>;
+export const usersByUsername = /* GraphQL */ `query UsersByUsername(
+  $username: String!
+  $sortDirection: ModelSortDirection
+  $filter: ModelUserFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  usersByUsername(
+    username: $username
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      email
+      name
+      username
+      bio
+      website
+      image
+      Posts {
+        nextToken
+        __typename
+      }
+      Comments {
+        nextToken
+        __typename
+      }
+      Likes {
+        nextToken
+        __typename
+      }
+      nofFollowers
+      nofFollowings
+      nofPosts
+      createdAt
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.UsersByUsernameQueryVariables,
+  APITypes.UsersByUsernameQuery
+>;

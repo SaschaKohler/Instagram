@@ -15,6 +15,8 @@ const ProfileHeader = ({user}: IProfileHeader) => {
   const currentUser = useAuthContext();
   const {signOut} = useAuthenticator();
   const navigation = useNavigation<ProfileNavigationProp>();
+  navigation.setOptions({title: user.username || 'Profile'});
+
   return (
     <View style={styles.root}>
       <View style={styles.headerRow}>

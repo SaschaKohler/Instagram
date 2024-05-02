@@ -1,18 +1,10 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TextInput,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import {ActivityIndicator, Alert, Image, Text, View} from 'react-native';
 import {Asset, launchImageLibrary} from 'react-native-image-picker';
-// import user from '../../assets/data/user.json';
-import colors from '../../theme/colors';
-import fonts from '../../theme/fonts';
-import {Control, Controller, set, useForm} from 'react-hook-form';
+import {useLazyQuery, useMutation, useQuery} from '@apollo/client';
+import {useNavigation} from '@react-navigation/native';
+import {deleteUser as authDeleteUser} from 'aws-amplify/auth';
 import {useEffect, useState} from 'react';
+import {useForm} from 'react-hook-form';
 import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
@@ -20,87 +12,37 @@ import {
   GetUserQueryVariables,
   UpdateUserMutation,
   UpdateUserMutationVariables,
-  User,
+  UsersByUsernameQuery,
+  UsersByUsernameQueryVariables,
 } from '../../API';
-import {useMutation, useQuery} from '@apollo/client';
-import {getUser, updateUser} from './queries';
-import {useAuthContext} from '../../contexts/AuthContext';
 import ApiErrorMessage from '../../components/ApiErrorMessage';
-import Navigation from '../../navigation';
-import {useNavigation} from '@react-navigation/native';
-import {deleteUser} from './queries';
-import {deleteUser as authDeleteUser} from 'aws-amplify/auth';
-import {useAuthenticator} from '@aws-amplify/ui-react-native';
+import {useAuthContext} from '../../contexts/AuthContext';
+import {deleteUser, getUser, updateUser, usersByUsername} from './queries';
+import styles from './styles';
+import CustomInput, {IEditableUser} from './CustomInput';
+import {DEFAULT_USER_IMAGE} from '../../config';
 
 const URL_REGEX =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/i;
-
-type IEditableUserField = 'name' | 'username' | 'website' | 'bio';
-type IEditableUser = Pick<User, IEditableUserField>;
-
-interface ICustomInput {
-  control: Control<IEditableUser, object>;
-  label: string;
-  name: IEditableUserField;
-  multiline?: boolean;
-  rules?: object;
-}
-
-const CustomInput = ({
-  control,
-  name,
-  label,
-  rules = {},
-  multiline = false,
-}: ICustomInput) => (
-  <Controller
-    control={control}
-    name={name}
-    rules={rules}
-    render={({field: {onChange, value, onBlur}, fieldState: {error}}) => {
-      return (
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>{label}</Text>
-          <View style={{flex: 1}}>
-            <TextInput
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              style={[
-                styles.input,
-                {borderColor: error ? colors.error : colors.border},
-              ]}
-              multiline={multiline}
-            />
-            {error && (
-              <Text style={{color: colors.error}}>
-                {error.message || 'Error'}
-              </Text>
-            )}
-          </View>
-        </View>
-      );
-    }}
-  />
-);
 
 const EditProfileScreen = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<null | Asset>(null);
   const {control, handleSubmit, setValue} = useForm<IEditableUser>();
   const navigation = useNavigation();
-  const {user, signOut, route} = useAuthenticator();
-  // const {user} = useAuthContext();
-  // const userId = currentUser.user?.userId;
-
-  console.log('EditProfileScreen: user: ', user);
+  const {user} = useAuthContext();
 
   const {data, loading, error, refetch} = useQuery<
     GetUserQuery,
     GetUserQueryVariables
-  >(getUser, {variables: {id: user.userId}});
+  >(getUser, {variables: {id: user?.userId}});
 
+  const [
+    getUsersByUsername,
+    {data: userData, loading: userLoading, error: userError},
+  ] = useLazyQuery<UsersByUsernameQuery, UsersByUsernameQueryVariables>(
+    usersByUsername,
+  );
   const authUser = data?.getUser;
-  console.log(user.signInDetails);
 
   useEffect(() => {
     if (authUser) {
@@ -168,7 +110,9 @@ const EditProfileScreen = () => {
     await doUpdateUser({
       variables: {input: {id: authUser?.id, ...formData}},
     });
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   const onChangePhoto = () => {
@@ -181,10 +125,34 @@ const EditProfileScreen = () => {
     );
   };
 
+  const validateUsername = async (username: string) => {
+    // query the database based on the username with userByUsername
+
+    try {
+      const response = await getUsersByUsername({
+        variables: {username: username},
+      });
+      if (response.error) {
+        Alert.alert('Error fetching username');
+        return 'Error fetching username';
+      }
+      const users = response.data?.usersByUsername?.items;
+      if (users && users?.length > 0) {
+        return 'Username already taken.';
+      }
+    } catch (error) {
+      Alert.alert('Error fetching username by username');
+    }
+
+    return true;
+  };
+
   return (
     <View style={styles.page}>
       <Image
-        source={{uri: selectedPhoto?.uri || authUser?.image}}
+        source={{
+          uri: selectedPhoto?.uri || authUser?.image || DEFAULT_USER_IMAGE,
+        }}
         style={styles.avatar}
       />
       <Text onPress={onChangePhoto} style={styles.textButton}>
@@ -220,6 +188,7 @@ const EditProfileScreen = () => {
             value: 3,
             message: 'min 3 chars',
           },
+          validate: validateUsername,
         }}
       />
       <CustomInput
@@ -252,39 +221,5 @@ const EditProfileScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  page: {
-    padding: 10,
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 100,
-    aspectRatio: 1,
-    borderRadius: 50,
-  },
-  textButton: {
-    margin: 10,
-    color: colors.primary,
-    fontWeight: fonts.weight.semi,
-  },
-  textButtonDanger: {
-    margin: 10,
-    color: colors.error,
-    fontWeight: fonts.weight.semi,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    marginVertical: 10,
-  },
-  label: {
-    width: 75,
-  },
-  input: {
-    borderBottomWidth: 1,
-  },
-});
 
 export default EditProfileScreen;

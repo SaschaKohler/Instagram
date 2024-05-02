@@ -34,6 +34,7 @@ type User @model @auth(rules: [{allow: public}]) {
   email: String!
   name: String
   username: String!
+    @index(name: "usersByUsername", queryField: "usersByUsername")
   bio: String
   website: AWSURL
   image: String
@@ -44,4 +45,4 @@ type User @model @auth(rules: [{allow: public}]) {
   nofFollowings: Int
   nofPosts: Int
 }
- 
+

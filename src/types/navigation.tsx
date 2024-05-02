@@ -4,7 +4,6 @@ import {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 
 export type RootNavigatorParamList = {
   Home: undefined;
