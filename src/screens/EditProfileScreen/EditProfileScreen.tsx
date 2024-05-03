@@ -3,6 +3,7 @@ import {Asset, launchImageLibrary} from 'react-native-image-picker';
 import {useLazyQuery, useMutation, useQuery} from '@apollo/client';
 import {useNavigation} from '@react-navigation/native';
 import {deleteUser as authDeleteUser} from 'aws-amplify/auth';
+
 import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {

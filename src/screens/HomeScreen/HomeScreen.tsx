@@ -15,14 +15,14 @@ import ApiErrorMessage from '../../components/ApiErrorMessage/ApiErrorMessage';
 
 const HomeScreen = () => {
   const [activePostId, setActivePostId] = useState<string | null>(null);
-  const {data, loading, error} = useQuery<
+  const {data, loading, error, refetch} = useQuery<
     ListPostsQuery,
     ListPostsQueryVariables
   >(listPosts);
 
-  const viewabilityConfig: ViewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 51,
-  });
+  // const viewabilityConfig: ViewabilityConfig = useRef({
+  //   itemVisiblePercentThreshold: 51,
+  // });
 
   const onViewableItemsChanged = useRef(
     ({viewableItems}: {viewableItems: Array<ViewToken>}) => {
@@ -42,7 +42,7 @@ const HomeScreen = () => {
     );
   }
 
-  const posts = data?.listPosts?.items || {};
+  const posts = (data?.listPosts?.items || []).filter(post => !post?._deleted);
 
   return (
     <View>
@@ -53,7 +53,9 @@ const HomeScreen = () => {
         }
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged.current}
-        viewabilityConfig={viewabilityConfig.current}
+        // viewabilityConfig={viewabilityConfig.current}
+        refreshing={loading}
+        onRefresh={() => refetch()}
       />
     </View>
   );

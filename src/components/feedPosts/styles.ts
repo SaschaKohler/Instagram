@@ -9,7 +9,7 @@ export default StyleSheet.create({
     padding: 10,
   },
   post: {
-    paddingTop: 50,
+    paddingTop: 5,
   },
   userAvatar: {
     width: 50,

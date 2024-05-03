@@ -3,13 +3,14 @@ import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import PostUploadScreen from '../screens/PostUploadScreen/PostUploadScreen';
+import CameraScreen from '../screens/CameraScreen/CameraScreen';
 import HomeStackNavigator from './HomeStackNavigator';
 import colors from '../theme/colors';
 import ProfileStackNavigator from './ProfileStackNavigator';
 import {BottomTabNavigatorParamList} from './types';
 import SearchTabNavigator from './SearchTabNavigator';
 import {Authenticator} from '@aws-amplify/ui-react-native';
+import UploadStackNavigator from './UploadStackNavigator';
 
 const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
 
@@ -43,7 +44,7 @@ const BottomTabNavigator = () => {
         />
         <Tab.Screen
           name="Upload"
-          component={PostUploadScreen}
+          component={UploadStackNavigator}
           options={{
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons
@@ -52,11 +53,12 @@ const BottomTabNavigator = () => {
                 color={color}
               />
             ),
+            headerShown: false,
           }}
         />
         <Tab.Screen
           name="Notifications"
-          component={PostUploadScreen}
+          component={CameraScreen}
           options={{
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons
@@ -65,6 +67,7 @@ const BottomTabNavigator = () => {
                 color={color}
               />
             ),
+            headerShown: false,
           }}
         />
         <Tab.Screen

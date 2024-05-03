@@ -9,8 +9,10 @@ import {
 } from 'expo-camera';
 import {useEffect, useState, useRef} from 'react';
 import colors from '../../theme/colors';
+import {useNavigation} from '@react-navigation/native';
+import {CameraNavigationProp} from '../../types/navigation';
 
-const PostUploadScreen = () => {
+const CameraScreen = () => {
   const [hasPermissons, setHasPermissons] = useState<boolean | null>(null);
   const [cameraType, setCameraType] = useState(CameraType.back);
   const [flash, setFlash] = useState(FlashMode.off);
@@ -45,6 +47,7 @@ const PostUploadScreen = () => {
   }, []);
 
   const camera = useRef<Camera>(null);
+  const navigation = useNavigation<CameraNavigationProp>();
 
   const takePicture = async () => {
     if (!isCameraReady || !camera.current || isRecording) {
@@ -80,11 +83,20 @@ const PostUploadScreen = () => {
     return <Text>No access to the camera</Text>;
   }
 
+  const navigateToCreateScreen = () => {
+    navigation.navigate('Create', {
+      images: [
+        'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/1.jpg',
+        'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/2.jpg',
+        'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/3.jpg',
+      ],
+    });
+  };
+
   const startRecording = async () => {
     if (!isCameraReady || !camera.current || isRecording) {
       return;
     }
-
     const options: CameraRecordingOptions = {
       quality: Camera.Constants.VideoQuality['640:480'],
       maxDuration: 60,
@@ -151,6 +163,13 @@ const PostUploadScreen = () => {
             color={colors.white}
           />
         </Pressable>
+        <Pressable onPress={navigateToCreateScreen}>
+          <MaterialIcons
+            name="arrow-forward-ios"
+            size={30}
+            color={colors.white}
+          />
+        </Pressable>
       </View>
     </View>
   );
@@ -180,4 +199,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
 });
-export default PostUploadScreen;
+export default CameraScreen;
