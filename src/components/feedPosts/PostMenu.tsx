@@ -14,6 +14,9 @@ import {deletePost} from './queries';
 import {DeletePostMutation, DeletePostMutationVariables} from '../../API';
 import {useAuthContext} from '../../contexts/AuthContext';
 import {Post} from '../../API';
+import Navigation from '../../navigation';
+import {useNavigation} from '@react-navigation/native';
+import {FeedNavigationProp} from '../../types/navigation';
 
 interface IPostMenu {
   post: Post;
@@ -21,12 +24,15 @@ interface IPostMenu {
 
 const PostMenu = ({post}: IPostMenu) => {
   const {user} = useAuthContext();
+  const navigation = useNavigation<FeedNavigationProp>();
   const [doDelete, {data, loading, error}] = useMutation<
     DeletePostMutation,
     DeletePostMutationVariables
   >(deletePost, {variables: {input: {id: post.id}}});
   const isMyPost = user?.userId === post.userID;
-  const onEditOptionPressed = () => {};
+  const onEditOptionPressed = () => {
+    navigation.navigate('UpdatePost', {id: post.id});
+  };
   const onDeleteOptionPressed = () => {
     Alert.alert('Are you sure?', 'Deleting a post is permanent', [
       {

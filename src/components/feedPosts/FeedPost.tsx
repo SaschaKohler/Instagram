@@ -12,9 +12,27 @@ import VideoPlayer from '../VideoPlayer';
 
 import {useNavigation} from '@react-navigation/native';
 import {FeedNavigationProp} from '../../types/navigation';
-import {Post} from '../../API';
+import {
+  CreateLikeMutation,
+  CreateLikeMutationVariables,
+  DeleteLikeMutation,
+  DeleteLikeMutationVariables,
+  LikesForPostByUserQuery,
+  LikesForPostByUserQueryVariables,
+  Post,
+  UpdatePostMutation,
+  UpdatePostMutationVariables,
+} from '../../API';
 import {DEFAULT_USER_IMAGE} from '../../config';
 import PostMenu from './PostMenu';
+import {useMutation, useQuery} from '@apollo/client';
+import {
+  LikesForPostByUser,
+  createLike,
+  deleteLike,
+  updatePost,
+} from './queries';
+import {useAuthContext} from '../../contexts/AuthContext';
 
 interface IFeedPost {
   post: Post;
@@ -22,15 +40,47 @@ interface IFeedPost {
 }
 
 const FeedPost = ({post, isVisible}: IFeedPost) => {
+  const {user} = useAuthContext();
   const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
-  const [isLiked, setLiked] = useState(false);
   const [isBookmarked, setBookmark] = useState(false);
   const navigation = useNavigation<FeedNavigationProp>();
+
+  const [doCreateLike] = useMutation<
+    CreateLikeMutation,
+    CreateLikeMutationVariables
+  >(createLike, {
+    variables: {input: {userID: user?.userId, postID: post.id}},
+    refetchQueries: ['LikesForPostByUser'],
+  });
+
+  const [doDeleteLike] = useMutation<
+    DeleteLikeMutation,
+    DeleteLikeMutationVariables
+  >(deleteLike, {refetchQueries: ['LikesForPostByUser']});
+
+  const {data: usersLikeData} = useQuery<
+    LikesForPostByUserQuery,
+    LikesForPostByUserQueryVariables
+  >(LikesForPostByUser, {
+    variables: {postID: post.id, userID: {eq: user?.userId}},
+  });
+
+  const [doUpdatePost] = useMutation<
+    UpdatePostMutation,
+    UpdatePostMutationVariables
+  >(updatePost);
+
+  const userLike = usersLikeData?.LikesForPostByUser?.items?.[0];
+
+  const postLikes = post.Likes?.items;
 
   const navigateToUser = () => {
     if (post.User) {
       navigation.navigate('UserProfile', {userId: post.User?.id});
     }
+  };
+  const navigateToLikesPage = () => {
+    navigation.navigate('PostLikes', {id: post.id});
   };
 
   const navigateToComments = () => {
@@ -40,10 +90,26 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
     setBookmark(v => !v);
   };
 
-  const toggleIsLiked = () => {
-    setLiked(v => !v);
+  const incrementNofLikes = (amount: 1 | -1) => {
+    doUpdatePost({
+      variables: {
+        input: {
+          id: post.id,
+          nofLikes: post.nofLikes + amount,
+        },
+      },
+    });
   };
 
+  const toggleIsLiked = () => {
+    if (userLike) {
+      doDeleteLike({variables: {input: {id: userLike.id}}});
+      incrementNofLikes(-1);
+    } else {
+      doCreateLike();
+      incrementNofLikes(1);
+    }
+  };
   const toggleDescriptionExpanded = () => {
     setDescriptionExpanded(v => !v);
   };
@@ -92,10 +158,10 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
         <View style={styles.iconContainer}>
           <Pressable onPress={toggleIsLiked}>
             <AntDesign
-              name={isLiked ? 'heart' : 'hearto'}
+              name={userLike ? 'heart' : 'hearto'}
               size={24}
               style={styles.icon}
-              color={isLiked ? colors.accent : colors.black}
+              color={userLike ? colors.accent : colors.black}
             />
           </Pressable>
           <IonIcons
@@ -121,10 +187,20 @@ const FeedPost = ({post, isVisible}: IFeedPost) => {
         </View>
 
         {/* Likes */}
-        <Text style={styles.text}>
-          Liked by <Text style={styles.bold}>{post.User?.username}</Text> and{' '}
-          <Text style={styles.bold}>{post.nofLikes} others</Text>
-        </Text>
+        {postLikes?.length === 0 ? (
+          <Text>Be the first to like the post!</Text>
+        ) : (
+          <Text style={styles.text} onPress={navigateToLikesPage}>
+            Liked by{' '}
+            <Text style={styles.bold}>{postLikes[0]?.User?.username}</Text>
+            {postLikes?.length > 1 && (
+              <>
+                {' '}
+                and <Text style={styles.bold}>{post.nofLikes - 1} others</Text>
+              </>
+            )}
+          </Text>
+        )}
 
         {/* Post description */}
         <Text style={styles.text} numberOfLines={isDescriptionExpanded ? 0 : 2}>

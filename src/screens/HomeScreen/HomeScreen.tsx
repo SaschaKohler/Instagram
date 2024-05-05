@@ -28,7 +28,6 @@ const HomeScreen = () => {
     ({viewableItems}: {viewableItems: Array<ViewToken>}) => {
       if (viewableItems.length > 0) {
         setActivePostId(viewableItems[0].item.id);
-        console.log(viewableItems[0].item.id);
       }
     },
   );

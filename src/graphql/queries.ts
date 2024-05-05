@@ -187,15 +187,17 @@ export const likesByUserID = /* GraphQL */ `query LikesByUserID(
   APITypes.LikesByUserIDQueryVariables,
   APITypes.LikesByUserIDQuery
 >;
-export const likesByPostID = /* GraphQL */ `query LikesByPostID(
+export const LikesForPostByUser = /* GraphQL */ `query LikesForPostByUser(
   $postID: ID!
+  $userID: ModelIDKeyConditionInput
   $sortDirection: ModelSortDirection
   $filter: ModelLikeFilterInput
   $limit: Int
   $nextToken: String
 ) {
-  likesByPostID(
+  LikesForPostByUser(
     postID: $postID
+    userID: $userID
     sortDirection: $sortDirection
     filter: $filter
     limit: $limit
@@ -242,8 +244,8 @@ export const likesByPostID = /* GraphQL */ `query LikesByPostID(
   }
 }
 ` as GeneratedQuery<
-  APITypes.LikesByPostIDQueryVariables,
-  APITypes.LikesByPostIDQuery
+  APITypes.LikesForPostByUserQueryVariables,
+  APITypes.LikesForPostByUserQuery
 >;
 export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
   getComment(id: $id) {
